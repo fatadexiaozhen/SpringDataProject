@@ -1,0 +1,178 @@
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15 layui-row-space10">
+        <!--TableLayout
+        <div class="layui-col-md12">
+          <div class="layui-row layui-col-space15">
+            <div class="layui-col-md3">
+              <div class="layui-card">
+                <div class="layui-card-body">
+                  访客
+                </div>
+              </div>
+            </div>
+            <div class="layui-col-md3">
+              <div class="layui-card">
+                <div class="layui-card-body">
+                  新用户
+                </div>
+              </div>
+            </div>
+            <div class="layui-col-md3">
+              <div class="layui-card">
+                <div class="layui-card-body">
+                  销售额
+                </div>
+              </div>
+            </div>
+            <div class="layui-col-md3">
+              <div class="layui-card">
+                <div class="layui-card-body">
+                  成交量
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>-->
+
+
+            <div class="layui-row layui-col-space15">
+                <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                    <legend>数据查询</legend>
+                </fieldset>
+                <div class="layui-col-md8">
+                    <div class="layui-row layui-col-space15">
+                        <!--列表-->
+                        <div class="layui-col-md12">
+                            <div class="layui-card">
+                                <form class="layui-form" action="">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">联动选择框</label>
+                                        <div class="layui-input-inline">
+                                            <select name="years">
+                                                <option value="">请选择年份</option>
+                                                <option value="18" selected="">2018</option>
+                                                <option value="17">2017</option>
+                                                <option value="16">2016</option>
+                                                <option value="15">2015</option>
+                                                <option value="14">2014</option>
+                                                <option value="13">2013</option>
+                                                <option value="12">2012</option>
+                                                <option value="11">2011</option>
+                                                <option value="10">2010</option>
+                                                <option value="9">2009</option>
+                                                <option value="8">2008</option>
+
+                                            </select>
+                                        </div>
+                                        <div class="layui-input-inline">
+                                            <select name="type">
+                                                <option value="">请选择类型</option>
+                                                <option value="division" selected="">行政区划</option>
+                                                <option value="water">水系</option>
+                                                <option value="poi">兴趣点</option>
+                                                <option value="traffic">交通</option>
+                                            </select>
+                                        </div>
+                                        <div class="layui-input-block">
+                                            <button class="layui-btn" lay-submit="" lay-filter="checkForm">查询</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="layui-card-body">
+                                    <table id="demo_hash" lay-filter="test_hash"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <fieldset class="layui-elem-field">
+                            <legend>相关数据</legend>
+                            <div class="layui-field-box" id = 'box'>
+                            </div>
+                        </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form','table'], function () {
+        var form = layui.form,
+            table = layui.table;
+        form.render('select');
+        form.on('submit(checkForm)', function(data) {
+            layer.msg('开始ajax', {time: 2000});
+            $.ajax({
+                url: "/tables/search",
+                data: JSON.stringify(data.field),
+                type: "POST",
+                dataType: "json",
+                success: function (result) {
+                    if (result.code == 0) {
+                        var  data  = result.data.toString();
+                        var relateDatas  = [1,2,3];
+                        var box = $('#box');
+                        relateDatas.forEach(function (v) {
+                            var o = $([
+                                ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                                ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'].join(''));
+                            box.append(o);
+                        });
+                    } else {
+                        layer.msg("表不存在", {icon: 5});
+                    }
+                }
+            })
+        });
+
+        table.render({
+            method: 'post',
+            done: function () {
+                $('#demo_hash').next().css('height', 'auto');
+            },
+            elem: '#demo_hash',
+            height: 420,
+            data:[{
+                "obj_id": "5101000115199",
+                "obj_name": "**小区",
+                "err_msg": "自相交错误"
+            },
+                {
+                    "obj_id": "5101000115100",
+                    "obj_name": "**小区",
+                    "err_msg": "拓扑错误"
+                }
+            ],
+            page: true, //开启分页
+            cols: [
+                [ //表头
+                    {
+                        field: 'obj_id',
+                        title: 'ID',
+                        width: 50,
+                        fixed: 'left',
+                        sort:true
+                    }, {
+                    field: 'obj_name',
+                    title: '地名',
+                    width: 80,
+                    sort:true
+                }, {
+                    field: 'err_msg',
+                    title: '错误类型',
+                    width: 80,
+                    sort: true
+                }
+                ]
+            ]
+            ,page: true   //开启分页
+            ,limit:10   //默认十条数据一页
+            ,limits:[10,20,30,50]  //数据分页条
+            ,id: 'testReload'
+        });
+    });
+</script>
+<style scoped>
+</style>
